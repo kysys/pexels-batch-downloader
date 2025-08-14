@@ -1,0 +1,249 @@
+# Pexels Batch Image Downloader - Apache Configuration
+
+# Copy this file to .htaccess and modify as needed
+
+# ================================================
+
+# BASIC SECURITY SETTINGS
+
+# ================================================
+
+# Disable server signature
+
+ServerSignature Off
+
+# Disable directory browsing by default
+
+Options -Indexes
+
+# Enable directory browsing for download folder only
+
+<Directory “download”>
+Options +Indexes
+DirectoryIndex disabled
+IndexOptions +FancyIndexing +HTMLTable +SuppressDescription +SuppressLastModified
+IndexIgnore .htaccess *.log *.tmp README.md .gitkeep
+
+```
+# Custom header for download directory
+HeaderName /download_header.html
+ReadmeName /download_footer.html
+```
+
+</Directory>
+
+# ================================================
+
+# PHP CONFIGURATION FOR IMAGE UPLOADS
+
+# ================================================
+
+# Increase upload limits for large images
+
+php_value upload_max_filesize 100M
+php_value post_max_size 100M
+php_value max_execution_time 300
+php_value memory_limit 512M
+php_value max_input_time 300
+
+# File upload settings
+
+php_value file_uploads On
+php_value max_file_uploads 20
+
+# ================================================
+
+# SECURITY HEADERS
+
+# ================================================
+
+# Prevent MIME type sniffing
+
+Header always set X-Content-Type-Options nosniff
+
+# XSS Protection
+
+Header always set X-XSS-Protection “1; mode=block”
+
+# Frame options (prevent clickjacking)
+
+Header always set X-Frame-Options SAMEORIGIN
+
+# Content Security Policy (adjust as needed)
+
+Header always set Content-Security-Policy “default-src ‘self’; script-src ‘self’ ‘unsafe-inline’ https://api.pexels.com https://images.pexels.com; img-src ‘self’ data: https: http:; style-src ‘self’ ‘unsafe-inline’; connect-src ‘self’ https://api.pexels.com https://images.pexels.com;”
+
+# ================================================
+
+# CORS CONFIGURATION FOR API
+
+# ================================================
+
+# Enable CORS for Pexels API calls
+
+Header always set Access-Control-Allow-Origin “*”
+Header always set Access-Control-Allow-Methods “GET, POST, OPTIONS, PUT, DELETE”
+Header always set Access-Control-Allow-Headers “Content-Type, Authorization, X-Requested-With”
+
+# Handle preflight requests
+
+RewriteEngine On
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# ================================================
+
+# CACHING CONFIGURATION
+
+# ================================================
+
+# Enable expires module
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+```
+# Cache downloaded images for 1 month
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|bmp|tiff)$">
+    ExpiresDefault "access plus 1 month"
+    Header append Cache-Control "public"
+</FilesMatch>
+
+# Cache CSS and JS for 1 week
+<FilesMatch "\.(css|js)$">
+    ExpiresDefault "access plus 1 week"
+    Header append Cache-Control "public"
+</FilesMatch>
+
+# Cache HTML for 1 hour
+<FilesMatch "\.(html|htm)$">
+    ExpiresDefault "access plus 1 hour"
+    Header append Cache-Control "public"
+</FilesMatch>
+```
+
+</IfModule>
+
+# ================================================
+
+# COMPRESSION (GZIP)
+
+# ================================================
+
+<IfModule mod_deflate.c>
+    # Compress HTML, CSS, JavaScript, Text, XML and fonts
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+</IfModule>
+
+# ================================================
+
+# FILE PROTECTION
+
+# ================================================
+
+# Protect sensitive files
+
+<FilesMatch “.(htaccess|htpasswd|ini|log|sh|sql|conf|yml|yaml|env)$”>
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+# Protect backup files
+
+<FilesMatch “.(backup|bak|old|orig|save|tmp)$”>
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+# ================================================
+
+# URL REWRITING (OPTIONAL)
+
+# ================================================
+
+# Enable URL rewriting
+
+RewriteEngine On
+
+# Redirect to HTTPS (uncomment if you have SSL)
+
+# RewriteCond %{HTTPS} off
+
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Pretty URLs for gallery
+
+RewriteRule ^gallery/?$ view_images.php [L,QSA]
+RewriteRule ^images/?$ view_images.php [L,QSA]
+
+# ================================================
+
+# ERROR PAGES
+
+# ================================================
+
+# Custom error pages (create these files if needed)
+
+ErrorDocument 400 /error/400.html
+ErrorDocument 401 /error/401.html
+ErrorDocument 403 /error/403.html
+ErrorDocument 404 /error/404.html
+ErrorDocument 500 /error/500.html
+
+# ================================================
+
+# ADDITIONAL SECURITY
+
+# ================================================
+
+# Disable PHP execution in download directory
+
+<Directory “download”>
+<FilesMatch “.php$”>
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+</Directory>
+
+# Prevent access to version control directories
+
+<DirectoryMatch “.git”>
+Order Allow,Deny
+Deny from all
+</DirectoryMatch>
+
+# ================================================
+
+# MAINTENANCE MODE (UNCOMMENT TO ENABLE)
+
+# ================================================
+
+# RewriteEngine On
+
+# RewriteCond %{REQUEST_URI} !/maintenance.html$
+
+# RewriteCond %{REQUEST_URI} !/maintenance/
+
+# RewriteRule ^(.*)$ /maintenance.html [R=503,L]
+
+# Header always set Retry-After “3600”
