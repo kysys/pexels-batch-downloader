@@ -24,7 +24,7 @@
 1. **Clone the repository**
    
    ```bash
-   git clone https://github.com/yourusername/pexels-batch-downloader.git
+   git clone https://github.com/kysys/pexels-batch-downloader.git
    cd pexels-batch-downloader
    ```
 1. **Setup web server**
@@ -231,7 +231,7 @@ Contributions are welcome! Please read our contributing guidelines:
 
 ```bash
 # Clone your fork
-git clone https://github.com/yourusername/pexels-batch-downloader.git
+git clone https://github.com/kysys/pexels-batch-downloader.git
 
 # Setup local development server
 php -S localhost:8000
@@ -250,10 +250,7 @@ This project is licensed under the MIT License - see the <LICENSE> file for deta
 - **Open Source Community** for tools and libraries used
 
 ## 📞 Support
-
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/pexels-batch-downloader/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/yourusername/pexels-batch-downloader/discussions)
-- 📖 **Documentation**: [Wiki](https://github.com/yourusername/pexels-batch-downloader/wiki)
+Contact/Website: https://kysys.net
 
 ## 🔗 Related Projects
 
